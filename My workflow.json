@@ -1,0 +1,227 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "visiting-card",
+        "responseMode": "lastNode",
+        "options": {
+          "responsePropertyName": "file"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f3f4ea9d-4939-4db7-83c3-a84d074af0b4",
+      "name": "Webhook",
+      "webhookId": "a17a3743-98ec-496b-b1e9-5c678fd7ca81"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "Extract the following details from this visiting card image.\nReturn ONLY JSON in this exact format:\n{\n  \"name\": \"\",\n  \"phone\": \"\",\n  \"email\": \"\",\n  \"company\": \"\",\n  \"designation\": \"\",\n  \"address\": \"\"\n}\nRules:\n- Do not explain anything\n- Do not add extra text\n- Only return JSON\n- If value missing, keep empty string \"\""
+            },
+            {
+              "type": "image",
+              "imageType": "base64",
+              "binaryPropertyName": "file"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "896c58c4-a7ce-41bc-be54-6f5c502fe420",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Kc0JuIx6U8qxbc9Z",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.output[0].content[0].text;\nconst jsonStart = text.indexOf('{');\nconst jsonEnd = text.lastIndexOf('}') + 1;\nconst cleanJson = text.substring(jsonStart, jsonEnd);\nconst data = JSON.parse(cleanJson);\n\ndata.phone = \"'\" + data.phone;\n\nreturn [{ json: data }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "fb045d3e-881a-4988-a042-6bf908b67eb4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1oU6-XkkfBoLAunLzZPuP972tD5TeEkgSLqFvECd4h1U",
+          "mode": "list",
+          "cachedResultName": "visiting cards leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oU6-XkkfBoLAunLzZPuP972tD5TeEkgSLqFvECd4h1U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oU6-XkkfBoLAunLzZPuP972tD5TeEkgSLqFvECd4h1U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "names": "={{ $json.name }}",
+            "phone": "={{ $json.phone }}",
+            "email": "={{ $json.email }}",
+            "designation": "={{ $json.designation }}",
+            "company": "={{ $json.company }}",
+            "address": "={{ $json.address }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "names",
+              "displayName": "names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "designation",
+              "displayName": "designation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        0
+      ],
+      "id": "95e0e1b0-2e4b-4049-8d3e-07e0a7a1ad4f",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TEiAZVVuqU8qvwgR",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7f5e8817-a201-49ea-aaf1-13215523ed24",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "db6a6456629e67324dfe0b42ecde0470bff1cb20db772b32d9f383aa46bd8a23"
+  },
+  "id": "prJS6bNsvB0mDbTc",
+  "tags": []
+}
