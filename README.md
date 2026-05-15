@@ -1,7 +1,3 @@
-Here’s a professional GitHub README description for your **Advanced AI Visiting Card Extractor Workflow using n8n + OpenAI + Google Sheets**.
-
----
-
 # 📇 AI Visiting Card Extractor using n8n + OpenAI
 
 An intelligent automation workflow built using **n8n**, **OpenAI GPT-4o-mini**, and **Google Sheets** to extract structured business lead information from visiting card images automatically.
